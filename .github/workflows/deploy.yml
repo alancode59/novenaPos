@@ -23,4 +23,12 @@ jobs:
 
     steps:
       - name: Trigger Render deploy
-        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        # --fail: sin el, un 401 por hook revocado deja el workflow en verde.
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "Falta el secret RENDER_DEPLOY_HOOK_URL (Settings > Secrets > Actions)." >&2
+            exit 1
+          fi
+          curl --fail --silent --show-error -X POST "$HOOK"
