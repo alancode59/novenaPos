@@ -4,12 +4,15 @@ databases:
     databaseName: posnovena
     user: posnovena
     plan: free
+    region: oregon
 
 services:
   - type: web
     name: posnovena
     env: docker
     plan: free
+    # Misma region que la base: la URL interna solo funciona dentro de ella.
+    region: oregon
     healthCheckPath: /auth/health
     # El unico camino a produccion es deploy.yml, que valida el build.
     autoDeploy: false
