@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesion - posNovena{% endblock %}
+{% block content %}
+{# Vars de la vista: error, next, username. `reason` sale de request.args. #}
+{% set reason = request.args.get('reason', '') %}
+<div class="min-h-screen flex flex-col md:flex-row">
+
+  {# Panel de marca, no interactivo. En movil colapsa a una franja. #}
+  <div class="bg-surface-brand text-text-inverse flex flex-row md:flex-col items-center
+              justify-start md:justify-center gap-3 md:gap-4 px-4 py-4 md:p-10
+              md:w-2/5 lg:w-1/3">
+    {# Arco de marca: bermellon como relleno decorativo, nunca interactivo. #}
+    <svg viewBox="0 0 120 120" class="h-10 w-10 md:h-20 md:w-20 shrink-0" role="img"
+         aria-label="Novena Pizzeria">
+      <circle cx="60" cy="60" r="58" class="fill-brand-cream" />
+      <path d="M20 88 A40 40 0 0 1 60 48" class="stroke-brand-teal" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+      <path d="M60 48 A40 40 0 0 1 100 88" class="stroke-brand-vermillion" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+      <path d="M33 88 A27 27 0 0 1 60 61" class="stroke-brand-teal" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+      <path d="M60 61 A27 27 0 0 1 87 88" class="stroke-brand-vermillion" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+      <path d="M46 88 A14 14 0 0 1 60 74" class="stroke-brand-teal" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+      <path d="M60 74 A14 14 0 0 1 74 88" class="stroke-brand-vermillion" stroke-width="9"
+            stroke-linecap="round" fill="none" />
+    </svg>
+    <div class="text-left md:text-center">
+      <p class="font-display text-lg md:text-3xl font-semibold leading-tight">novena</p>
+      <p class="hidden md:block text-text-inverse/80 text-xs md:text-sm font-semibold
+                uppercase tracking-[0.2em] mt-0.5">
+        Pizzeria
+      </p>
+      <p class="hidden md:block text-text-inverse/70 text-sm mt-3">
+        Sistema de punto de venta para restaurantes
+      </p>
+      {# `device_name` opcional: identifica la tablet cuando hay varias iguales. #}
+      {% if device_name | default('') %}
+      <p class="text-text-inverse/70 text-xs md:text-sm mt-1">{{ device_name }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Formulario #}
+  <div class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-sm">
+      <h1 class="font-display text-2xl font-semibold text-text-primary mb-1">Iniciar sesion</h1>
+      <p class="text-sm text-text-secondary mb-6">Ingresa con tu usuario y tu contrasena o PIN.</p>
+
+      <form id="login-form" method="post" action="{{ url_for('auth.login') }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="next" value="{{ next | default('') }}">
+
+        <div>
+          <label for="username" class="field-label">Usuario</label>
+          <input type="text" id="username" name="username" required autofocus
+                 autocomplete="username" autocapitalize="off" spellcheck="false"
+                 value="{{ username | default('') }}"
+                 class="{{ 'field-input-error' if error else 'field-input' }}">
+        </div>
+
+        <div>
+          <label for="password" class="field-label">
+            Contrasena o PIN
+          </label>
+          <div class="relative">
+            <input type="password" id="password" name="password" required
+                   autocomplete="current-password" inputmode="text"
+                   class="{{ 'field-input-error' if error else 'field-input' }} pr-12">
+            <button type="button" id="toggle-password-visibility"
+                    class="absolute inset-y-0 right-0 flex items-center px-3
+                           text-text-muted hover:text-text-secondary"
+                    aria-label="Mostrar contrasena" aria-pressed="false">
+              <svg id="icon-eye-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <svg id="icon-eye-closed" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                   viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+          <label class="mt-2 inline-flex items-center gap-2 text-sm text-text-secondary select-none">
+            <input type="checkbox" id="toggle-numeric-keypad"
+                   class="rounded border-border-strong accent-interactive-primary">
+            Usar teclado numerico
+          </label>
+        </div>
+
+        {# Altura reservada: el boton no salta cuando aparece el error. #}
+        <div class="min-h-[5.5rem] flex items-center" aria-live="polite">
+          {% if error %}
+          <div class="alert-error w-full" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-5 h-5 shrink-0 mt-0.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <div>
+              <p class="font-medium">{{ error }}</p>
+              <p class="mt-1">
+                Revisa mayusculas y minusculas. Si el problema sigue, pedile a un administrador que revise tu cuenta.
+              </p>
+            </div>
+          </div>
+          {% elif reason == 'expired' %}
+          <div class="alert-info w-full" role="status">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-5 h-5 shrink-0 mt-0.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            <p>Tu sesion expiro por inactividad. Inicia sesion de nuevo.</p>
+          </div>
+          {% elif reason == 'logout' %}
+          <div class="flex items-start gap-3 rounded-control border-l-4 px-4 py-3 text-sm w-full
+                      bg-status-neutral-soft border-status-neutral text-status-neutral-text" role="status">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-5 h-5 shrink-0 mt-0.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Sesion cerrada.</p>
+          </div>
+          {% else %}
+          <p class="w-full text-sm text-text-muted">
+            Problemas para entrar? Pedile ayuda a un administrador.
+          </p>
+          {% endif %}
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn-primary w-full">
+          <svg id="login-spinner" class="hidden animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span id="login-submit-label">Entrar</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -10,20 +10,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:8.4
+      postgres:
+        image: postgres:16
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: posnovena_test
+          POSTGRES_DB: posnovena_test
+          POSTGRES_USER: posnovena
+          POSTGRES_PASSWORD: posnovena
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-cmd="pg_isready -U posnovena -d posnovena_test"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
     env:
-      DATABASE_URL: mysql+pymysql://root:root@127.0.0.1:3306/posnovena_test
+      DATABASE_URL: postgresql+psycopg://posnovena:posnovena@127.0.0.1:5432/posnovena_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -31,3 +32,11 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: pytest
+
+      # Compilarlo aqui hace que un tailwind roto falle en CI y no en produccion.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build:css

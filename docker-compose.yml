@@ -5,34 +5,38 @@ services:
       - "5000:5000"
     env_file: .env
     depends_on:
-      - mysql
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
 
-  mysql:
-    image: mysql:8.4
+  db:
+    image: postgres:16
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-posnovena}
-      MYSQL_USER: ${MYSQL_USER:-posnovena}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-posnovena}
+      POSTGRES_DB: ${POSTGRES_DB:-posnovena}
+      POSTGRES_USER: ${POSTGRES_USER:-posnovena}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-posnovena}
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-posnovena} -d ${POSTGRES_DB:-posnovena}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  phpmyadmin:
-    image: phpmyadmin:5
+  # Reemplaza a phpMyAdmin: un solo binario y habla Postgres.
+  adminer:
+    image: adminer:4
     restart: unless-stopped
     environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      ADMINER_DEFAULT_SERVER: db
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
-      - mysql
+      - db
 
 volumes:
-  mysql_data:
+  postgres_data:
