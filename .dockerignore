@@ -1,0 +1,41 @@
+# Control de versiones
+.git
+.gitignore
+
+# Entorno / secretos
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Node / Tailwind build tooling
+node_modules/
+
+# Tests y cobertura
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Subagentes de Claude Code (no hacen falta dentro del contenedor)
+.claude/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+# Logs
+*.log
