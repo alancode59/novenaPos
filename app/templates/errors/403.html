@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado - posNovena{% endblock %}
+{% block content %}
+{#
+  Variable opcional esperada de la vista: `home_url` (URL de la pantalla
+  de inicio segun el rol del usuario autenticado). Si backend aun no la
+  pasa, se usa un fallback seguro que no rompe el render (ver default
+  abajo) en vez de asumir un endpoint que podria no existir todavia.
+
+  Deliberadamente NO se muestra a que area pertenecia la URL solicitada
+  (no confirmarle a un mesero que esa ruta era de caja, por ejemplo) ni
+  ningun detalle tecnico.
+#}
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="card w-full max-w-sm text-center">
+    <div class="mx-auto mb-4 h-14 w-14 rounded-full bg-status-danger-soft flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+           stroke="currentColor" class="w-8 h-8 text-status-danger">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+    </div>
+
+    <h1 class="font-display text-lg font-semibold text-text-primary mb-2">Acceso denegado</h1>
+    <p class="text-sm text-text-secondary mb-6">No tienes acceso a esta seccion.</p>
+
+    <a href="{{ home_url | default(url_for('auth.login')) }}" class="btn-primary w-full">
+      Ir a mi pantalla de inicio
+    </a>
+  </div>
+</div>
+{% endblock %}

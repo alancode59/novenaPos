@@ -1,3 +1,195 @@
+/* Fuentes auto-hospedadas: el wifi del local no debe bloquear el render. */
+@font-face {
+  font-family: "Fredoka";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/fredoka-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/inter-variable.woff2") format("woff2");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-base text-text-primary font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-text-primary;
+  }
+
+  /* Foco visible consistente en toda la app (teclado y lectores de mano
+     en cocina/caja lo necesitan igual que el mouse en admin). Se apoya
+     en `border.focus`, ya verificado en 4.7:1 sobre `surface.base`. */
+  :focus-visible {
+    outline: 2px solid theme("colors.border.focus");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Botones. Area tactil de 56px: es un POS de tablet, no una web. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 min-h-touch-lg
+           rounded-control px-6 text-base font-semibold
+           transition-colors duration-150
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-interactive-primary text-interactive-primary-text
+           hover:bg-interactive-primary-hover
+           active:bg-interactive-primary-active;
+  }
+
+  .btn-secondary {
+    @apply btn bg-interactive-secondary border-2 border-interactive-secondary-border
+           text-interactive-secondary-text
+           hover:bg-interactive-secondary-hover;
+  }
+
+  .btn-danger {
+    @apply btn bg-interactive-danger text-interactive-danger-text
+           hover:bg-interactive-danger-hover
+           active:bg-interactive-danger-active;
+  }
+
+  /* Boton de icono cuadrado (ej. cerrar, editar), mismo minimo tactil. */
+  .btn-icon {
+    @apply inline-flex items-center justify-center min-h-touch min-w-touch
+           rounded-control text-text-secondary hover:bg-surface-sunken
+           transition-colors duration-150
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Campo de formulario */
+  .field-label {
+    @apply block text-sm font-medium text-text-secondary mb-1;
+  }
+
+  .field-input {
+    @apply block w-full min-h-touch rounded-control border-2 border-border-strong
+           bg-surface-raised text-text-primary text-base px-4 py-2.5
+           placeholder:text-text-muted
+           focus:outline-none focus:border-border-focus focus:ring-4 focus:ring-border-focus/30
+           disabled:bg-surface-disabled disabled:text-text-disabled disabled:cursor-not-allowed;
+  }
+
+  /* NOTA para quien mantenga esto: esta clase NO se escribe como
+     `@apply field-input border-border-danger ...` a proposito. Tailwind
+     no garantiza el orden de cascada cuando dos @apply de una MISMA
+     propiedad (border-color / focus:border-color) provienen, una de una
+     clase custom ya expandida (`field-input`) y otra añadida encima: el
+     override se pierde en silencio (se probo y el borde rojo no ganaba).
+     Por eso aqui se repite la lista completa de utilidades en vez de
+     extender `.field-input`. */
+  .field-input-error {
+    @apply block w-full min-h-touch rounded-control border-2 border-border-danger
+           bg-surface-raised text-text-primary text-base px-4 py-2.5
+           placeholder:text-text-muted
+           focus:outline-none focus:border-border-danger focus:ring-4 focus:ring-interactive-danger/25
+           disabled:bg-surface-disabled disabled:text-text-disabled disabled:cursor-not-allowed;
+  }
+
+  .field-help {
+    @apply mt-1 text-sm text-text-muted;
+  }
+
+  .field-error {
+    @apply mt-1 text-sm font-medium text-status-danger-text;
+  }
+
+  /* Banners de alerta. Siempre icono + texto, nunca solo color. */
+  .alert {
+    @apply flex items-start gap-3 rounded-control border-l-4 px-4 py-3 text-sm;
+  }
+
+  .alert-error {
+    @apply alert bg-status-danger-soft border-status-danger text-status-danger-text;
+  }
+
+  .alert-info {
+    @apply alert bg-status-info-soft border-status-info text-status-info-text;
+  }
+
+  .alert-success {
+    @apply alert bg-status-success-soft border-status-success text-status-success-text;
+  }
+
+  .alert-warning {
+    @apply alert bg-status-warning-soft border-status-warning text-status-warning-text;
+  }
+
+  /* Tarjeta */
+  .card {
+    @apply bg-surface-raised border border-border-subtle rounded-card shadow-card p-5;
+  }
+
+  .card-title {
+    @apply font-display font-semibold text-xl text-text-primary mb-1;
+  }
+
+  .card-subtitle {
+    @apply text-sm text-text-secondary;
+  }
+
+  /* Badge de estado de pedido. SIEMPRE icono + etiqueta, nunca solo color:
+     nueva=circulo, preparacion=reloj, lista=check, entregada=doble check. */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-pill px-3 py-1
+           text-sm font-semibold uppercase tracking-wide;
+  }
+
+  .badge-order-new {
+    @apply badge bg-order-new-soft text-order-new-text;
+  }
+
+  .badge-order-preparing {
+    @apply badge bg-order-preparing-soft text-order-preparing-text;
+  }
+
+  .badge-order-ready {
+    @apply badge bg-order-ready-soft text-order-ready-text;
+  }
+
+  .badge-order-delivered {
+    @apply badge bg-order-delivered-soft text-order-delivered-text;
+  }
+
+  /* Chip solido y grande para el tablero de cocina (KDS): se lee a un
+     brazo de distancia, con vapor/grasa de por medio, por eso usa
+     `display-1`/`text-xl` en vez de los tamanos pequenos de `.badge`. */
+  .kds-chip {
+    @apply inline-flex items-center gap-2 rounded-control px-4 py-2
+           text-xl font-display font-semibold text-white;
+  }
+
+  .kds-chip-new {
+    @apply kds-chip bg-order-new;
+  }
+
+  .kds-chip-preparing {
+    @apply kds-chip bg-order-preparing;
+  }
+
+  .kds-chip-ready {
+    @apply kds-chip bg-order-ready;
+  }
+
+  .kds-chip-delivered {
+    @apply kds-chip bg-order-delivered;
+  }
+}

@@ -1,10 +1,38 @@
+# El plan free expira a los 30 dias; un cliente real necesita plan de pago.
+databases:
+  - name: posnovena-db
+    databaseName: posnovena
+    user: posnovena
+    plan: free
+
 services:
   - type: web
     name: posnovena
     env: docker
-    plan: starter
+    plan: free
+    healthCheckPath: /auth/health
+    # El unico camino a produccion es deploy.yml, que valida el build.
+    autoDeploy: false
     envVars:
+      # Render la entrega como `postgres://`; app/config.py la reescribe.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: posnovena-db
+          property: connectionString
+
+      # Fail-fast: si falta, la app no arranca.
       - key: SECRET_KEY
+        generateValue: true
+
+      # Cambiarlo invalida TODOS los passwords existentes.
+      - key: PASSWORD_PEPPER
+        generateValue: true
+
+      - key: FLASK_ENV
+        value: production
+
+      # Primer admin; la clave solo sirve para el primer login.
+      - key: ADMIN_USERNAME
         sync: false
-      - key: MONGO_URI
+      - key: ADMIN_PASSWORD
         sync: false
