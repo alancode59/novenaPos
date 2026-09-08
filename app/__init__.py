@@ -9,6 +9,8 @@ def create_app(config_class=Config):
 
     init_db(app)
 
+    from app import models
+
     from app.routes.auth import auth_bp
     from app.routes.orders import orders_bp
     from app.routes.kitchen import kitchen_bp
