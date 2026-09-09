@@ -29,7 +29,10 @@ en `output.css` hasta que recompilas.
 Una base recién creada no tiene usuarios (`scripts/seed_db.py` solo
 siembra productos). Para crear el admin inicial:
 
-    ADMIN_USERNAME=admin ADMIN_PASSWORD='una-clave-larga' python scripts/create_admin.py
+    PYTHONPATH=. ADMIN_USERNAME=admin ADMIN_PASSWORD='una-clave-larga' python scripts/create_admin.py
+
+El `PYTHONPATH=.` hace falta al correrlo desde el host; dentro del
+contenedor ya viene puesto. Lo mismo aplica a `scripts/seed_db.py`.
 
 Se crea con `must_change_password=True`: esa clave solo sirve para el
 primer login.
